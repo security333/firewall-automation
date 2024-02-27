@@ -1,7 +1,7 @@
 import requests
 
 # Define the URL
-url = 'https://nsd2.vzwnet.com'
+url = 'https://mysite.com'
 
 # Create a session
 session = requests.Session()
