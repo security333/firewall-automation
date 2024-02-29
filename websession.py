@@ -1,23 +1,36 @@
 import requests
+from bs4 import BeautifulSoup
 
-# Define the URL
 url = 'https://mysite.com'
-
-# Create a session
 session = requests.Session()
-
-# Send a GET request to the URL to establish the session
 contact_nsd = session.get(url)
 
-# Get the first form from the response
-form = contact_nsd.forms[0]
+# Parse HTML content using BeautifulSoup
+soup = BeautifulSoup(contact_nsd.content, 'html.parser')
 
-# Set the username and password fields in the form
-form.fields['username'] = nsd_creds.username
-form.fields['password'] = nsd_creds.password
+# Find all form elements
+forms = soup.find_all('form')
 
-# Send a POST request with the form data
-contact_nsd = session.post(url + form.action, data=form.fields)
+# Assuming there's at least one form
+if forms:
+    # Select the first form
+    form = forms[0]
+    
+    # Extract form action URL
+    action = form.get('action')
+    
+    # Extract form fields
+    fields = {}
+    for input_tag in form.find_all('input'):
+        fields[input_tag.get('name')] = input_tag.get('value', '')
+    
+    # Populate form fields with credentials
+    fields['username'] = nsd_creds.username
+    fields['password'] = nsd_creds.password
+    
+    # Perform POST request with form data
+    contact_nsd = session.post(url + action, data=fields)
 
-# Set the IP counter to 0
-IP_counter = 0
+    # Continue processing the response as needed
+else:
+    print("No forms found on the page")
