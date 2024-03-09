@@ -13,7 +13,7 @@ for index, ip in indexedIPs:
     response = mysession.post(url + '/inventory/resolveIP', json=ip_params)
     results = response.json()
 
-    NSD_properties = {
+    ghn_properties = {
         "Index": index,
         "IP": results["ip"],
         "FW_IP": results["subnet"],
@@ -30,7 +30,7 @@ for index, ip in indexedIPs:
     }
 
     with open(f"ip_info-{increment}.json", "w") as json_file:
-        json.dump(NSD_properties, json_file)
+        json.dump(ghn_properties, json_file)
 
     # Delay for 100 milliseconds
     import time
