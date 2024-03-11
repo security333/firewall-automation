@@ -17,7 +17,7 @@ for line in indexed_ips:
     ip = line[1]
     ip_params = {'ip': ip, 'withinSubnet': 'true'}
     print(f"Please wait. Requesting detailed information for {ip}...")
-    results = session.post(url + '/inventory/resolveIP', data=ip_params)
+    results = session.post(url + '/inventory/traceroute', data=ip_params)
     nsd_properties = {
         'Index': index,
         'IP': results.json()['ip'],
