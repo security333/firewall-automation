@@ -12,6 +12,8 @@ for /f "usebackq tokens=*" %%i in ("%input_file%") do (
     echo.
 )
 
-#Make sure to replace "ips.txt" with the actual path to your input file containing IP addresses. This script will execute a traceroute to each IP address listed in the file.
+:: Make sure to replace "ips.txt" with the actual path to your input file containing IP addresses. 
+:: This script will execute a traceroute to each IP address listed in the file.
 
-#Save the script with a .bat extension (e.g., traceroute_ips.bat) and run it in the MS-DOS environment. It will read each line of the input file, perform a traceroute to the corresponding IP address, and display the results.
+:: Save the script with a .bat extension (e.g., traceroute_ips.bat) and run it in the MS-DOS environment. 
+:: It will read each line of the input file, perform a traceroute to the corresponding IP address, and display the results.
