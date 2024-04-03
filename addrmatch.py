@@ -2,6 +2,9 @@ import subprocess
 import re
 import os
 
+# (?:[a-fA-F0-9]{1,4}:){3,7}(?:::[a-fA-F0-9]{1,4})?
+
+
 ipv4 = "ipv4_regex_pattern"  # Define your IPv4 regex pattern
 addresses = ["address1", "address2", "address3"]  # Example list of addresses
 
@@ -22,3 +25,4 @@ for addr in addresses:
             for hop_counter, ip in enumerate(extracted_ips, start=1):
                 hop_incr = f"{hop_counter:02}"
                 file.write(f"{trace_incr}-{hop_incr}, {ip}\n")
+                
