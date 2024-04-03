@@ -2,7 +2,21 @@ import subprocess
 import re
 import os
 
-# (?:[a-fA-F0-9]{1,4}:){3,7}(?:::[a-fA-F0-9]{1,4})?
+ipv6_pattern = (
+    r'('
+    # Full IPv6 address with all eight groups separated by colons
+    r'([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}'
+    r'|'
+    # IPv6 address with double colon abbreviation (e.g., ::1)
+    r'((([0-9a-fA-F]{1,4}:){1,6})|::)(([0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4})?'
+    r'|'
+    # IPv6 address with leading zeros in each group omitted (e.g., 2001:db8::1)
+    r'([0-9a-fA-F]?::[0-9a-fA-F]{1,4})|([0-9a-fA-F]{1,4}::[0-9a-fA-F]{1,4})'
+    r'|'
+    # IPv6 address with IPv4-mapped IPv6 address representation (e.g., ::ffff:192.0.2.1)
+    r'(::ffff:((0{0,3}\d|0x[0-9a-fA-F]{1,2})\.){3}(0{0,3}\d|0x[0-9a-fA-F]{1,2}))'
+    r')'
+)
 
 
 ipv4 = "ipv4_regex_pattern"  # Define your IPv4 regex pattern
