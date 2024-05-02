@@ -1,0 +1,65 @@
+Login to MySQL server:
+mysql -u <username> -p
+
+Login to MySQL server with a specific host:
+mysql -u <username> -p -h <host>
+
+Database Operations:
+List all databases:
+SHOW DATABASES;
+
+Create a new database:
+CREATE DATABASE <database_name>;
+
+Use a specific database:
+USE <database_name>;
+
+Delete a database:
+DROP DATABASE <database_name>;
+
+Table Operations:
+Show tables in the current database:
+SHOW TABLES;
+
+Create a new table:
+CREATE TABLE <table_name> (
+    column1 datatype constraints,
+    column2 datatype constraints,
+    ...
+);
+
+Describe a table:
+DESCRIBE <table_name>;
+
+Delete a table:
+DROP TABLE <table_name>;
+
+Data Manipulation:
+Insert data into a table:
+INSERT INTO <table_name> (column1, column2, ...)
+VALUES (value1, value2, ...);
+
+Select data from a table:
+SELECT * FROM <table_name>;
+
+Update data in a table:
+UPDATE <table_name>
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
+
+Delete data from a table:
+DELETE FROM <table_name> WHERE condition;
+
+User Management:
+Create a new user:
+CREATE USER '<username>'@'<hostname>' IDENTIFIED BY '<password>';
+
+Grant privileges to a user:
+GRANT <privileges> ON <database_name>.<table_name> TO '<username>'@'<hostname>';
+Replace <privileges>, <database_name>, <table_name>, <username>, and <hostname> with the desired values.
+
+Flush privileges:
+FLUSH PRIVILEGES;
+
+Exit MySQL client:
+exit;
