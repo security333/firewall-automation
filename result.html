@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tracouteroute Result</title>
+</head>
+<body>
+    <h1>Route from {{ start_point }} to {{ end_point }}</h1>
+    <ul>
+        {% for point in route %}
+            <li>{{ point }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
