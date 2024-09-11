@@ -1,0 +1,11 @@
+Steps to Run the Script
+Install OpenStack SDK: If you haven’t already, install the OpenStack SDK using pip:
+pip install openstacksdk
+
+Configure OpenStack SDK: Ensure you have your OpenStack cloud configuration file (clouds.yaml) set up correctly. This file typically resides in ~/.config/openstack/clouds.yaml.
+
+Deployment
+To run this script, ensure that:
+
+You have the correct OpenStack credentials set up in the clouds.yaml file, or you can pass authentication details directly.
+The networks, image, flavor, keypair, and security groups are available in your OpenStack environment.
