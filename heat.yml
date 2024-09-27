@@ -64,3 +64,17 @@ outputs:
   instance_ip:
     description: The IP addresses assigned to the instance
     value: { get_attr: [ my_vm, networks ] }
+
+
+
+openstack stack create -t vm_with_4_interfaces.yaml \
+--parameter image=ubuntu-20.04 \
+--parameter flavor=m1.medium \
+--parameter key_name=mykey \
+--parameter network_1=a1b2c3d4-e5f6-7890-gh12-ijklmno3p4 \
+--parameter network_2=b1c2d3e4-f5g6-7890-hi12-jklmnpo5q6 \
+--parameter network_3=c1d2e3f4-g5h6-7890-ij12-klmnoq6r7s \
+--parameter network_4=d1e2f3g4-h5i6-7890-jk12-lmnopq7r8t \
+my-heat-stack
+
+openstack stack show my-heat-stack
