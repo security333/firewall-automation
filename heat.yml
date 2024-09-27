@@ -1,0 +1,66 @@
+heat_template_version: 2016-10-14
+
+description: >
+  Heat Template to create a VM with 4 network interfaces
+
+parameters:
+  image:
+    type: string
+    description: Image to use for the VM
+    default: ubuntu-20.04
+  flavor:
+    type: string
+    description: Flavor to use for the VM
+    default: m1.medium
+  key_name:
+    type: string
+    description: Name of an existing key pair
+  network_1:
+    type: string
+    description: First network for the VM's NIC
+  network_2:
+    type: string
+    description: Second network for the VM's NIC
+  network_3:
+    type: string
+    description: Third network for the VM's NIC
+  network_4:
+    type: string
+    description: Fourth network for the VM's NIC
+
+resources:
+  # Create a Security Group
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: vm_security_group
+      rules:
+        - protocol: icmp
+          direction: ingress
+        - protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+          direction: ingress
+
+  # Create the VM with 4 network interfaces
+  my_vm:
+    type: OS::Nova::Server
+    properties:
+      name: my-new-vm
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      security_groups: [ { get_resource: security_group } ]
+      networks:
+        - network: { get_param: network_1 }
+        - network: { get_param: network_2 }
+        - network: { get_param: network_3 }
+        - network: { get_param: network_4 }
+
+outputs:
+  instance_name:
+    description: Name of the created instance
+    value: { get_attr: [ my_vm, name ] }
+  instance_ip:
+    description: The IP addresses assigned to the instance
+    value: { get_attr: [ my_vm, networks ] }
