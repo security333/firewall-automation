@@ -1,0 +1,10 @@
+openstack server create \
+  --flavor <FLAVOR_ID> \
+  --image <IMAGE_ID> \
+  --key-name <KEY_NAME> \
+  --security-group <SECURITY_GROUP> \
+  --nic net-id=<NETWORK_ID_1> \
+  --nic net-id=<NETWORK_ID_2> \
+  --nic net-id=<NETWORK_ID_3> \
+  --nic net-id=<NETWORK_ID_4> \
+  <VM_NAME>
