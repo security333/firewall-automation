@@ -1,0 +1,35 @@
+Steps to Use the Script:
+Modify the Variables:
+
+Replace the placeholders like network-1-id, mykey, and ubuntu-20.04 with actual values from your OpenStack environment. You can obtain these by running OpenStack CLI commands like openstack network list, openstack flavor list, and openstack image list.
+Source OpenStack Credentials:
+
+Make sure that you have sourced your OpenStack credentials using the following command to load the environment variables:
+bash
+Copy code
+source openrc.sh
+Make the Script Executable:
+
+Save the script as create_vm_with_4_networks.sh and make it executable by running:
+bash
+Copy code
+chmod +x create_vm_with_4_networks.sh
+Run the Script:
+
+Run the script to create the VM and associate a floating IP:
+bash
+Copy code
+./create_vm_with_4_networks.sh
+How the Script Works:
+OpenStack Commands:
+
+The openstack server create command is used to create a virtual machine (VM). It specifies the flavor, image, security group, key pair, and 4 network interfaces (with --nic for each network).
+The openstack floating ip create and openstack server add floating ip commands are used to allocate and associate a floating IP to give the VM external access.
+Environment Variables:
+
+The script checks if the OpenStack credentials (OS_AUTH_URL, OS_PROJECT_NAME, etc.) are sourced to avoid errors. If not, it exits with an error message.
+Summary:
+This script automates the creation of a VM with 4 network interfaces in OpenStack and assigns a floating IP for external access.
+Modify the variables according to your OpenStack environment (networks, flavors, images).
+Make sure OpenStack CLI and credentials are set up before running the script.
+By running this script, you’ll quickly create a VM with the desired configuration in your OpenStack environment without manually issuing multiple commands.
