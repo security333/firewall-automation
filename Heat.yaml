@@ -1,0 +1,231 @@
+heat_template_version: 2016-10-14
+
+description: >
+  Heat template to create a network, subnet, router, and a VM with four interfaces (one for management).
+
+parameters:
+  management_network_name:
+    type: string
+    default: management_network
+    description: Name of the management network.
+
+  internal_network_1_name:
+    type: string
+    default: internal_network_1
+    description: Name of internal network 1.
+
+  internal_network_2_name:
+    type: string
+    default: internal_network_2
+    description: Name of internal network 2.
+
+  internal_network_3_name:
+    type: string
+    default: internal_network_3
+    description: Name of internal network 3.
+
+  management_subnet_cidr:
+    type: string
+    default: 10.0.0.0/24
+    description: CIDR for the management subnet.
+
+  internal_subnet_1_cidr:
+    type: string
+    default: 192.168.1.0/24
+    description: CIDR for internal subnet 1.
+
+  internal_subnet_2_cidr:
+    type: string
+    default: 192.168.2.0/24
+    description: CIDR for internal subnet 2.
+
+  internal_subnet_3_cidr:
+    type: string
+    default: 192.168.3.0/24
+    description: CIDR for internal subnet 3.
+
+  router_name:
+    type: string
+    default: my_router
+    description: Name of the router.
+
+resources:
+  # Management network and subnet
+  management_network:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: management_network_name }
+
+  management_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: management_network }
+      cidr: { get_param: management_subnet_cidr }
+      ip_version: 4
+      gateway_ip: 10.0.0.1
+      allocation_pools:
+        - start: 10.0.0.10
+          end: 10.0.0.50
+      dns_nameservers:
+        - 8.8.8.8
+        - 8.8.4.4
+
+  # Internal network 1 and subnet
+  internal_network_1:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: internal_network_1_name }
+
+  internal_subnet_1:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: internal_network_1 }
+      cidr: { get_param: internal_subnet_1_cidr }
+      ip_version: 4
+      gateway_ip: 192.168.1.1
+      allocation_pools:
+        - start: 192.168.1.10
+          end: 192.168.1.50
+      dns_nameservers:
+        - 8.8.8.8
+        - 8.8.4.4
+
+  # Internal network 2 and subnet
+  internal_network_2:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: internal_network_2_name }
+
+  internal_subnet_2:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: internal_network_2 }
+      cidr: { get_param: internal_subnet_2_cidr }
+      ip_version: 4
+      gateway_ip: 192.168.2.1
+      allocation_pools:
+        - start: 192.168.2.10
+          end: 192.168.2.50
+      dns_nameservers:
+        - 8.8.8.8
+        - 8.8.4.4
+
+  # Internal network 3 and subnet
+  internal_network_3:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: internal_network_3_name }
+
+  internal_subnet_3:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: internal_network_3 }
+      cidr: { get_param: internal_subnet_3_cidr }
+      ip_version: 4
+      gateway_ip: 192.168.3.1
+      allocation_pools:
+        - start: 192.168.3.10
+          end: 192.168.3.50
+      dns_nameservers:
+        - 8.8.8.8
+        - 8.8.4.4
+
+  # Create a router and attach subnets
+  my_router:
+    type: OS::Neutron::Router
+    properties:
+      name: { get_param: router_name }
+      external_gateway_info:
+        network: public  # Replace with your external/public network name or ID
+
+  management_router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router: { get_resource: my_router }
+      subnet: { get_resource: management_subnet }
+
+  internal_router_interface_1:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router: { get_resource: my_router }
+      subnet: { get_resource: internal_subnet_1 }
+
+  internal_router_interface_2:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router: { get_resource: my_router }
+      subnet: { get_resource: internal_subnet_2 }
+
+  internal_router_interface_3:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router: { get_resource: my_router }
+      subnet: { get_resource: internal_subnet_3 }
+
+  # Create security group allowing SSH and ICMP traffic
+  my_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: my_security_group
+      rules:
+        - protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+          direction: ingress
+        - protocol: icmp
+          direction: ingress
+
+  # Create four ports for the VM
+  management_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: management_network }
+      security_groups: [ { get_resource: my_security_group } ]
+
+  internal_port_1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: internal_network_1 }
+      security_groups: [ { get_resource: my_security_group } ]
+
+  internal_port_2:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: internal_network_2 }
+      security_groups: [ { get_resource: my_security_group } ]
+
+  internal_port_3:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: internal_network_3 }
+      security_groups: [ { get_resource: my_security_group } ]
+
+  # Create the VM with four network interfaces
+  my_vm:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.small
+      image: ubuntu-20.04
+      key_name: mykey
+      networks:
+        - port: { get_resource: management_port }
+        - port: { get_resource: internal_port_1 }
+        - port: { get_resource: internal_port_2 }
+        - port: { get_resource: internal_port_3 }
+
+outputs:
+  vm_management_network:
+    description: Management network port for the VM
+    value: { get_resource: management_port }
+
+  vm_internal_network_1:
+    description: Internal network 1 port for the VM
+    value: { get_resource: internal_port_1 }
+
+  vm_internal_network_2:
+    description: Internal network 2 port for the VM
+    value: { get_resource: internal_port_2 }
+
+  vm_internal_network_3:
+    description: Internal network 3 port for the VM
+    value: { get_resource: internal_port_3 }
