@@ -1,0 +1,111 @@
+50-cloud examples...
+
+#cloud-config
+network:
+  version: 2
+  ethernets:
+    ens3:
+      dhcp4: no
+      addresses:
+        - 63.56.53.244/28
+      gateway4: 63.56.53.241
+      nameservers:
+        addresses:
+          - 10.215.210.71
+          - 10.215.136.71
+    ens4:
+      dhcp4: no
+      addresses:
+        - 63.56.53.228/28
+      routes:
+        - to: 63.56.53.224/28
+          via: 63.56.53.225
+          on-link: true
+    ens5:
+      dhcp4: no
+      addresses:
+        - 10.1.98.36/28
+      routes:
+        - to: 10.1.98.32/28
+          via: 10.1.98.33
+          on-link: true
+    ens6:
+      dhcp4: no
+      addresses:
+        - 63.59.44.52/28
+      routes:
+        - to: 63.59.44.48/28
+          via: 63.59.44.49
+          on-link: true
+****************************************************
+#cloud-config
+network:
+  version: 2
+  ethernets:
+    ens3:
+      dhcp4: false
+      addresses:
+        - 63.56.53.244/28
+      gateway4: 63.56.53.241
+      nameservers:
+        addresses: [10.215.210.71, 10.215.136.71]
+    ens4:
+      dhcp4: false
+      addresses:
+        - 63.56.53.228/28
+    ens5:
+      dhcp4: false
+      addresses:
+        - 10.1.98.36/28
+    ens6:
+      dhcp4: false
+      addresses:
+        - 63.59.44.52/28
+  routes:
+    - to: 63.56.53.224/28
+      via: 63.56.53.241
+      on-link: true
+    - to: 10.1.98.32/28
+      via: 10.1.98.36
+      on-link: true
+    - to: 63.59.44.48/28
+      via: 63.59.44.52
+      on-link: true
+*******************************************************
+#cloud-config
+network:
+  version: 2
+  ethernets:
+    ens3:
+      dhcp4: no
+      addresses:
+        - 63.56.53.244/28
+      gateway4: 63.56.53.241   # Assuming the gateway for the management network
+      nameservers:
+        addresses:
+          - 10.215.210.71
+          - 10.215.136.71
+    ens4:
+      dhcp4: no
+      addresses:
+        - 63.56.53.228/28
+      routes:
+        - to: 63.56.53.224/28
+          via: 63.56.53.241
+    ens5:
+      dhcp4: no
+      addresses:
+        - 10.1.98.36/28
+      routes:
+        - to: 10.1.98.32/28
+          via: 10.1.98.33   # Replace with the correct gateway if different
+    ens6:
+      dhcp4: no
+      addresses:
+        - 63.59.44.52/28
+      routes:
+        - to: 63.59.44.48/28
+          via: 63.59.44.49   # Replace with the correct gateway if different
+  routes:
+    - to: 0.0.0.0/0
+      via: 63.56.53.241      # Management interface as the default route
