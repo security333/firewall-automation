@@ -1,5 +1,6 @@
 import yaml
 import os
+import ipaddress
 
 def load_cloud_init(file_path):
     """Load the cloud-init YAML file."""
@@ -29,10 +30,20 @@ def get_interface_by_selection(selection):
     }
     return mapping.get(selection)
 
-def get_gateway_from_routes(routes):
-    """Get the gateway ('via') from existing routes."""
-    if routes:
-        return routes[0].get("via")  # Assumes the first route contains the gateway
+def is_ipv6(address):
+    """Determine if an address is IPv6."""
+    try:
+        return ipaddress.ip_network(address, strict=False).version == 6
+    except ValueError:
+        return False
+
+def get_gateway_for_network(interface_config, is_ipv6_network):
+    """Get the IPv4 or IPv6 gateway from existing routes."""
+    if "routes" in interface_config:
+        for route in interface_config["routes"]:
+            route_ip_version = is_ipv6(route.get("to", "0.0.0.0"))
+            if route_ip_version == is_ipv6_network:
+                return route.get("via")
     return None
 
 def network_exists(interface_config, network):
@@ -52,16 +63,17 @@ def add_network_to_interface(config, interface, network):
         return config
 
     iface_config = config["network"]["ethernets"][interface]
+    is_ipv6_network = is_ipv6(network)
 
     # Ensure the network doesn't already exist
     if network_exists(iface_config, network):
         print(f"Network {network} already exists on interface {interface}.")
         return config
 
-    # Get the gateway from the existing routes
-    gateway = get_gateway_from_routes(iface_config.get("routes", []))
+    # Get the appropriate gateway for the network type
+    gateway = get_gateway_for_network(iface_config, is_ipv6_network)
     if not gateway:
-        print(f"No existing gateway found for interface {interface}. Cannot add network.")
+        print(f"No existing gateway found for {'IPv6' if is_ipv6_network else 'IPv4'} on interface {interface}. Cannot add network.")
         return config
 
     # Add the new network to addresses and routes
@@ -70,7 +82,7 @@ def add_network_to_interface(config, interface, network):
         "to": network,
         "via": gateway
     })
-    print(f"Added network {network} to interface {interface} with gateway {gateway}.")
+    print(f"Added {'IPv6' if is_ipv6_network else 'IPv4'} network {network} to interface {interface} with gateway {gateway}.")
     return config
 
 def main():
@@ -93,7 +105,7 @@ def main():
         return
 
     # Ask the user for the network address
-    network = input("Enter network address (e.g., 10.2.4.5/22): ").strip()
+    network = input("Enter network address (e.g., 10.2.4.5/22 or 2001:db8::/32): ").strip()
 
     # Update the configuration
     updated_config = add_network_to_interface(config, interface, network)
