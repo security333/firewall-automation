@@ -29,26 +29,48 @@ def get_interface_by_selection(selection):
     }
     return mapping.get(selection)
 
+def get_gateway_from_routes(routes):
+    """Get the gateway ('via') from existing routes."""
+    if routes:
+        return routes[0].get("via")  # Assumes the first route contains the gateway
+    return None
+
 def network_exists(interface_config, network):
     """Check if the network already exists in the interface configuration."""
-    for subnet in interface_config.get("subnets", []):
-        if subnet.get("addresses") and network in subnet["addresses"]:
-            return True
+    if "addresses" in interface_config and network in interface_config["addresses"]:
+        return True
+    if "routes" in interface_config:
+        for route in interface_config["routes"]:
+            if route.get("to") == network:
+                return True
     return False
 
 def add_network_to_interface(config, interface, network):
     """Add the network to the specified interface in the config."""
-    for iface in config.get("network", {}).get("ethernets", {}):
-        if iface == interface:
-            if not network_exists(config["network"]["ethernets"][iface], network):
-                config["network"]["ethernets"][iface].setdefault("subnets", []).append({
-                    "addresses": [network]
-                })
-                print(f"Added network {network} to interface {interface}.")
-            else:
-                print(f"Network {network} already exists on interface {interface}.")
-            return config
-    print(f"Interface {interface} not found in configuration.")
+    if interface not in config.get("network", {}).get("ethernets", {}):
+        print(f"Interface {interface} not found in configuration.")
+        return config
+
+    iface_config = config["network"]["ethernets"][interface]
+
+    # Ensure the network doesn't already exist
+    if network_exists(iface_config, network):
+        print(f"Network {network} already exists on interface {interface}.")
+        return config
+
+    # Get the gateway from the existing routes
+    gateway = get_gateway_from_routes(iface_config.get("routes", []))
+    if not gateway:
+        print(f"No existing gateway found for interface {interface}. Cannot add network.")
+        return config
+
+    # Add the new network to addresses and routes
+    iface_config.setdefault("addresses", []).append(network)
+    iface_config.setdefault("routes", []).append({
+        "to": network,
+        "via": gateway
+    })
+    print(f"Added network {network} to interface {interface} with gateway {gateway}.")
     return config
 
 def main():
