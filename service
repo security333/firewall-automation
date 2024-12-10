@@ -1,0 +1,16 @@
+[Unit]
+Description=Command-Line Python Script
+After=network.target
+
+[Service]
+ExecStart=/path/to/your/script.py
+Restart=on-failure
+User=root
+Group=root
+WorkingDirectory=/path/to/your/script
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
